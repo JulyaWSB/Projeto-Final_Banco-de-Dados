@@ -520,18 +520,21 @@ SELECT * FROM vw_consultas_ordenadas;
 
 ---------------------------------------------------------------------------------
 --5
-SELECT 
-    d.id_dentista,
-    d.nome AS nome_dentista,
-    COUNT(c.id_consulta) AS total_consultas,
-    COUNT(pr.id_procedimento) AS total_procedimentos,
-    STRING_AGG(DISTINCT pr.id_procedimento::text, ', ') AS ids_procedimentos,
-    STRING_AGG(DISTINCT proc.nome_procedimento, ', ') AS nomes_procedimentos,
-    ROUND(COUNT(c.id_consulta)::numeric / 
-        (SELECT COUNT(*) FROM clinica.dentistas)::numeric, 2) AS media_consultas
+WITH consultas_dentistas AS (
+    SELECT 
+        d.nome AS nome_dentista,
+        COUNT(DISTINCT c.id_consulta) AS total_consultas
     FROM clinica.dentistas d
     LEFT JOIN clinica.consultas c ON d.id_dentista = c.id_dentista
-    LEFT JOIN clinica.procedimentos_realizados pr ON c.id_consulta = pr.id_consulta
-    LEFT JOIN clinica.procedimentos proc ON pr.id_procedimento = proc.id_procedimento
     GROUP BY d.id_dentista, d.nome
-    ORDER BY total_consultas DESC;
+),
+total_consultas AS (
+    SELECT SUM(total_consultas) AS sum_total FROM consultas_dentistas
+)
+SELECT 
+    cd.nome_dentista AS "Nome",
+	cd.total_consultas AS "Consutas",
+    ROUND((cd.total_consultas / tc.sum_total), 2) AS "Média (consultas totais/consultas médico)" 
+FROM consultas_dentistas cd 
+CROSS JOIN total_consultas tc 
+ORDER BY cd.total_consultas DESC;
