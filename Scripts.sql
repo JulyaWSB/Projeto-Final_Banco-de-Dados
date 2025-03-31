@@ -403,7 +403,7 @@ VALUES
 ('2024-11-28', NULL, NULL, 8, 10, 15, 'ausente'),
 ('2024-09-29', NULL, NULL, 6, 9, 13, 'agendada'),
 ('2023-07-08', NULL, NULL, 7, 3, 4, 'realizada'),
-('2022-05-05', 'Consulta de rotina', 9, 1, 2, 'cancelada'),
+('2022-05-05', 'Consulta de rotina', NULL, 9, 1, 2, 'cancelada'),
 ('2021-06-30', 'Limpeza e revisão', 'Canal', 1, 3, 5, 'realizada'),
 ('2025-04-15', 'Consulta de rotina', NULL, 2, 4, 6, 'agendada'),
 ('2025-05-20', 'Procedimento ortodôntico', 'Uso de elásticos', 4, 5, 8, 'realizada'),
