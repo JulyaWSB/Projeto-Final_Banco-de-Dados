@@ -7,8 +7,6 @@
 --CRIAR SCHEMA
 --CREATE SCHEMA clinica;
 
-
-
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
@@ -255,8 +253,7 @@ VALUES
 ('00000-000', 10, 1);
 
 INSERT INTO clinica.endereco
-(id_paciente,
-numero,
+(numero,
 complemento,
 id_cidade,
 id_bairro,
@@ -277,34 +274,34 @@ VALUES
 
 ---------------------------------------------------------------------------------
 --PACIENTES
-INSERT INTO clinica.email (email, id_paciente)
+INSERT INTO clinica.email (email)
 VALUES
-('jose@email.com', 1),
-('leticia@email.com', 2),
-('victor@email.com', 3),
-('laryssa@email.com', 4),
-('Beatriz@email.com', 5),
-('carlos@email.com', 6),
-('marcos@email.com', 7),
-('fernanda@email.com', 8),
-('ricardo@email.com', 9),
-('patricia@email.com', 10),
-('joazinhogmail.com', 11);
+('jose@email.com'),
+('leticia@email.com'),
+('victor@email.com'),
+('laryssa@email.com'),
+('Beatriz@email.com'),
+('carlos@email.com'),
+('marcos@email.com'),
+('fernanda@email.com'),
+('ricardo@email.com'),
+('patricia@email.com'),
+('joazinhogmail.com');
 
 
-INSERT INTO clinica.telefone (telefone, id_paciente)
+INSERT INTO clinica.telefone (telefone)
 VALUES
-('(11) 9999-8888', 1),
-('(11) 9888-7777', 2),
-('(11) 9777-6666', 3),
-('(11) 9666-5555', 4),
-('(11) 9444-3333', 5),
-('(11) 9555-4444', 6),
-('(11) 9333-2222', 7),
-('(11) 9222-1111', 8),
-('(11) 9111-0000', 9),
-('(11) 9000-9999', 10),
-('(21) 9955-5577', 11);
+('(11) 9999-8888'),
+('(11) 9888-7777'),
+('(11) 9777-6666'),
+('(11) 9666-5555'),
+('(11) 9444-3333'),
+('(11) 9555-4444'),
+('(11) 9333-2222'),
+('(11) 9222-1111'),
+('(11) 9111-0000'),
+('(11) 9000-9999'),
+('(21) 9955-5577');
 
 INSERT INTO clinica.paciente
 (nome_paciente, cpf, data_nascimento, id_endereco, historico_consultas, id_email, id_telefone)
@@ -487,6 +484,47 @@ FROM clinica.paciente p
 LEFT JOIN clinica.consultas c ON p.id_paciente = c.id_paciente
 GROUP BY p.nome_paciente
 ORDER BY total_consultas DESC;
+
+---------------------------------------------------------------------------------
+--4
+CREATE VIEW vw_consultas_ordenadas AS
+SELECT 
+    c.id_consulta,
+    p.nome_paciente AS nome_paciente,
+    d.nome AS nome_dentista,
+    c.data_consulta,
+    pr.id_procedimento,
+	c.status AS status_da_consulta
+FROM 
+    clinica.consultas c
+JOIN 
+    clinica.paciente p ON c.id_paciente = p.id_paciente
+JOIN 
+    clinica.dentistas d ON c.id_dentista = d.id_dentista
+LEFT JOIN 
+    clinica.procedimentos_realizados pr ON c.id_consulta = pr.id_consulta
+ORDER BY 
+    c.data_consulta DESC;
+
+SELECT * FROM vw_consultas_ordenadas;
+
+---------------------------------------------------------------------------------
+--5
+SELECT 
+    d.id_dentista,
+    d.nome AS nome_dentista,
+    COUNT(c.id_consulta) AS total_consultas,
+    COUNT(pr.id_procedimento) AS total_procedimentos,
+    STRING_AGG(DISTINCT pr.id_procedimento::text, ', ') AS ids_procedimentos,
+    STRING_AGG(DISTINCT proc.nome_procedimento, ', ') AS nomes_procedimentos,
+    ROUND(COUNT(c.id_consulta)::numeric / 
+        (SELECT COUNT(*) FROM clinica.dentistas)::numeric, 2) AS media_consultas
+    FROM clinica.dentistas d
+    LEFT JOIN clinica.consultas c ON d.id_dentista = c.id_dentista
+    LEFT JOIN clinica.procedimentos_realizados pr ON c.id_consulta = pr.id_consulta
+    LEFT JOIN clinica.procedimentos proc ON pr.id_procedimento = proc.id_procedimento
+    GROUP BY d.id_dentista, d.nome
+    ORDER BY total_consultas DESC;
 
 ---------------------------------------------------------------------------------
 --4
