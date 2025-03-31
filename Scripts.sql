@@ -398,7 +398,7 @@ descricao_consulta,
 prescricao,
 id_paciente,
 id_dentista,
-id_horario)
+id_horario, status)
 VALUES
 ('2021-08-17', NULL, NULL, 1, 1, 1),
 ('2025-01-10', NULL, NULL, 3, 3, 5),
@@ -410,6 +410,20 @@ VALUES
 ('2023-07-08', NULL, NULL, 7, 3, 4),
 ('2022-05-05', '', '', 9, 1, 2),
 ('2021-06-30', '', '', 1, 3, 5);
+
+INSERT INTO clinica.consultas
+(data_consulta, descricao_consulta, prescricao, id_paciente, id_dentista, id_horario, status)
+VALUES
+('2025-04-15', 'Consulta de rotina', NULL, 2, 4, 6, 'agendada'),
+('2025-05-20', 'Procedimento ortodôntico', 'Uso de elásticos', 4, 5, 8, 'realizada'),
+('2024-12-10', 'Avaliação inicial', NULL, 7, 8, 12, 'cancelada'),
+('2024-10-05', 'Limpeza e revisão', NULL, 3, 2, 4, 'realizada'),
+('2025-07-22', 'Dor no dente inferior direito', 'Anti-inflamatório prescrito', 6, 3, 7, 'agendada'),
+('2024-11-05', 'Consulta de retorno', NULL, 8, 10, 15, 'ausente'),
+('2023-08-19', 'Extração de dente do siso', 'Prescrito analgésico', 10, 6, 11, 'realizada'),
+('2022-10-30', 'Aparelho ortodôntico', 'Manutenção do aparelho', 1, 7, 3, 'realizada'),
+('2024-06-14', 'Canal', 'Tratamento endodôntico iniciado', 9, 1, 5, 'cancelada'),
+('2023-09-25', 'Check-up anual', NULL, 5, 4, 9, 'realizada');
 
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
@@ -505,6 +519,20 @@ ORDER BY
 
 SELECT * FROM vw_consultas_ordenadas;
 
-
 ---------------------------------------------------------------------------------
 --5
+SELECT 
+    d.id_dentista,
+    d.nome AS nome_dentista,
+    COUNT(c.id_consulta) AS total_consultas,
+    COUNT(pr.id_procedimento) AS total_procedimentos,
+    STRING_AGG(DISTINCT pr.id_procedimento::text, ', ') AS ids_procedimentos,
+    STRING_AGG(DISTINCT proc.nome_procedimento, ', ') AS nomes_procedimentos,
+    ROUND(COUNT(c.id_consulta)::numeric / 
+        (SELECT COUNT(*) FROM clinica.dentistas)::numeric, 2) AS media_consultas
+    FROM clinica.dentistas d
+    LEFT JOIN clinica.consultas c ON d.id_dentista = c.id_dentista
+    LEFT JOIN clinica.procedimentos_realizados pr ON c.id_consulta = pr.id_consulta
+    LEFT JOIN clinica.procedimentos proc ON pr.id_procedimento = proc.id_procedimento
+    GROUP BY d.id_dentista, d.nome
+    ORDER BY total_consultas DESC;
