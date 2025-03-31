@@ -393,27 +393,18 @@ VALUES
 --CONSULTAS
 
 INSERT INTO clinica.consultas
-(data_consulta,
-descricao_consulta,
-prescricao,
-id_paciente,
-id_dentista,
-id_horario, status)
-VALUES
-('2021-08-17', NULL, NULL, 1, 1, 1),
-('2025-01-10', NULL, NULL, 3, 3, 5),
-('2024-02-11', NULL, NULL, 6, 2, 3),
-('2020-11-01', NULL, NULL, 5, 7, 11),
-('2019-08-12', NULL, NULL, 10, 6, 10),
-('2024-11-28', NULL, NULL, 8, 10, 15),
-('2024-09-29', NULL, NULL, 6, 9, 13),
-('2023-07-08', NULL, NULL, 7, 3, 4),
-('2022-05-05', '', '', 9, 1, 2),
-('2021-06-30', '', '', 1, 3, 5);
-
-INSERT INTO clinica.consultas
 (data_consulta, descricao_consulta, prescricao, id_paciente, id_dentista, id_horario, status)
 VALUES
+('2021-08-17', NULL, NULL, 1, 1, 1, 'realizada'),
+('2025-01-10', NULL, NULL, 3, 3, 5, 'agendada'),
+('2024-02-11', NULL, NULL, 6, 2, 3, 'realizada'),
+('2020-11-01', NULL, NULL, 5, 7, 11, 'cancelada'),
+('2019-08-12', NULL, NULL, 10, 6, 10, 'realizada'),
+('2024-11-28', NULL, NULL, 8, 10, 15, 'ausente'),
+('2024-09-29', NULL, NULL, 6, 9, 13, 'agendada'),
+('2023-07-08', NULL, NULL, 7, 3, 4, 'realizada'),
+('2022-05-05', 'Consulta de rotina', 9, 1, 2, 'cancelada'),
+('2021-06-30', 'Limpeza e revisão', 'Canal', 1, 3, 5, 'realizada'),
 ('2025-04-15', 'Consulta de rotina', NULL, 2, 4, 6, 'agendada'),
 ('2025-05-20', 'Procedimento ortodôntico', 'Uso de elásticos', 4, 5, 8, 'realizada'),
 ('2024-12-10', 'Avaliação inicial', NULL, 7, 8, 12, 'cancelada'),
