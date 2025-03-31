@@ -2,10 +2,9 @@
 --CRIAR DATABASE
 --CREATE DATABASE ProjetoFinal;
 
-
 ---------------------------------------------------------------------------------
 --CRIAR SCHEMA
---CREATE SCHEMA clinica;
+CREATE SCHEMA clinica;
 
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
@@ -89,20 +88,6 @@ CREATE TABLE IF NOT EXISTS clinica.paciente
     FOREIGN KEY (id_endereco) REFERENCES clinica.endereco(id_endereco)
 );
 
-ALTER TABLE clinica.email ADD COLUMN id_paciente INT;
-
-ALTER TABLE clinica.email
-ADD CONSTRAINT id_paciente
-FOREIGN KEY (id_paciente) REFERENCES clinica.paciente(id_paciente)
-ON DELETE CASCADE;
-
-ALTER TABLE clinica.telefone ADD COLUMN id_paciente INT;
-
-ALTER TABLE clinica.telefone
-ADD CONSTRAINT id_paciente
-FOREIGN KEY (id_paciente) REFERENCES clinica.paciente(id_paciente)
-ON DELETE CASCADE;
-
 ALTER TABLE clinica.paciente ADD COLUMN id_email INT;
 
 ALTER TABLE clinica.paciente
@@ -152,14 +137,14 @@ CREATE TABLE IF NOT EXISTS clinica.horario (
 
 ---------------------------------------------------------------------------------
 --TABELA CONSULTAS
-CREATE TYPE status_consulta AS ENUM ('agendada', 'cancelada', 'realizada', 'ausente');
+CREATE TYPE clinica.status_consulta AS ENUM ('agendada', 'cancelada', 'realizada', 'ausente');
 
 CREATE TABLE IF NOT EXISTS clinica.consultas(
     id_consulta SERIAL PRIMARY KEY NOT NULL,
     data_consulta DATE NOT NULL,
     descricao_consulta VARCHAR(200) DEFAULT NULL,
     prescricao VARCHAR(200) DEFAULT NULL,
-    status status_consulta DEFAULT 'agendada',
+    status clinica.status_consulta DEFAULT 'agendada',
     id_paciente INT NOT NULL,
     id_dentista INT NOT NULL,
     id_horario INT NOT NULL,
@@ -179,10 +164,8 @@ CREATE TABLE IF NOT EXISTS clinica.procedimentos(
 
 CREATE TABLE IF NOT EXISTS clinica.procedimentos_realizados(
     id_procedimentos_realizados SERIAL PRIMARY KEY,
-    id_paciente INT NOT NULL,
     id_procedimento INT NOT NULL,
     id_consulta INT NOT NULL,
-    FOREIGN KEY(id_paciente) REFERENCES clinica.paciente(id_paciente),
     FOREIGN KEY(id_procedimento) REFERENCES clinica.procedimentos(id_procedimento),
     FOREIGN KEY(id_consulta) REFERENCES clinica.consultas(id_consulta)
 );
@@ -374,19 +357,6 @@ VALUES
 (9, 2, 8),
 (10, 3, 7);
 
-INSERT INTO clinica.procedimentos (nome_procedimento, descricao_procedimento, tempo_procedimento)
-VALUES
-('Consulta Inicial', 'Avaliação inicial do paciente', '0.5'),
-('Limpeza Dental', 'Remoção de tártaro e polimento dos dentes', '0.75'),
-('Restauração', 'Tratamento de cárie com resina composta', '0.4'),
-('Canal', 'Tratamento endodôntico', '1.5'),
-('Extração', 'Remoção de dente', '0.5'),
-('Aparelho Ortodôntico', 'Colocação ou manutenção de aparelho', '0.5'),
-('Clareamento', 'Clareamento dental a laser', '1'),
-('Implante', 'Instalação de implante dentário', '2'),
-('Raio-X Panorâmico', 'Exame radiográfico completo', '0.3'),
-('Moldagem', 'Obtenção de moldes para prótese', '0.5');
-
 ---------------------------------------------------------------------------------
 --CONSULTAS
 
@@ -413,6 +383,46 @@ VALUES
 ('2022-10-30', 'Aparelho ortodôntico', 'Manutenção do aparelho', 1, 7, 3, 'realizada'),
 ('2024-06-14', 'Canal', 'Tratamento endodôntico iniciado', 9, 1, 5, 'cancelada'),
 ('2023-09-25', 'Check-up anual', NULL, 5, 4, 9, 'realizada');
+
+---------------------------------------------------------------------------------
+--PROCEDIMENTOS
+
+INSERT INTO clinica.procedimentos (nome_procedimento, descricao_procedimento, tempo_procedimento)
+VALUES
+('Consulta Inicial', 'Avaliação inicial do paciente', '0.5'),
+('Limpeza Dental', 'Remoção de tártaro e polimento dos dentes', '0.75'),
+('Restauração', 'Tratamento de cárie com resina composta', '0.4'),
+('Canal', 'Tratamento endodôntico', '1.5'),
+('Extração', 'Remoção de dente', '0.5'),
+('Aparelho Ortodôntico', 'Colocação ou manutenção de aparelho', '0.5'),
+('Clareamento', 'Clareamento dental a laser', '1'),
+('Implante', 'Instalação de implante dentário', '2'),
+('Raio-X Panorâmico', 'Exame radiográfico completo', '0.3'),
+('Moldagem', 'Obtenção de moldes para prótese', '0.5');
+
+INSERT INTO clinica.procedimentos_realizados (id_consulta, id_procedimento)
+VALUES
+(2,1),
+(3,2),
+(3,3),
+(6,1),
+(7,2),
+(8,4),
+(11,2),
+(12,6),
+(13,1),
+(14,2),
+(14,9),
+(15,1),
+(15,9),
+(16,1),
+(17,5),
+(19,2),
+(19,4),
+(20,1),
+(20,2);
+
+
 
 ---------------------------------------------------------------------------------
 ---------------------------------------------------------------------------------
@@ -495,47 +505,6 @@ SELECT
     c.data_consulta,
     pr.id_procedimento,
 	c.status AS status_da_consulta
-FROM 
-    clinica.consultas c
-JOIN 
-    clinica.paciente p ON c.id_paciente = p.id_paciente
-JOIN 
-    clinica.dentistas d ON c.id_dentista = d.id_dentista
-LEFT JOIN 
-    clinica.procedimentos_realizados pr ON c.id_consulta = pr.id_consulta
-ORDER BY 
-    c.data_consulta DESC;
-
-SELECT * FROM vw_consultas_ordenadas;
-
----------------------------------------------------------------------------------
---5
-SELECT 
-    d.id_dentista,
-    d.nome AS nome_dentista,
-    COUNT(c.id_consulta) AS total_consultas,
-    COUNT(pr.id_procedimento) AS total_procedimentos,
-    STRING_AGG(DISTINCT pr.id_procedimento::text, ', ') AS ids_procedimentos,
-    STRING_AGG(DISTINCT proc.nome_procedimento, ', ') AS nomes_procedimentos,
-    ROUND(COUNT(c.id_consulta)::numeric / 
-        (SELECT COUNT(*) FROM clinica.dentistas)::numeric, 2) AS media_consultas
-    FROM clinica.dentistas d
-    LEFT JOIN clinica.consultas c ON d.id_dentista = c.id_dentista
-    LEFT JOIN clinica.procedimentos_realizados pr ON c.id_consulta = pr.id_consulta
-    LEFT JOIN clinica.procedimentos proc ON pr.id_procedimento = proc.id_procedimento
-    GROUP BY d.id_dentista, d.nome
-    ORDER BY total_consultas DESC;
-
----------------------------------------------------------------------------------
---4
-CREATE VIEW vw_consultas_ordenadas AS
-SELECT 
-    c.id_consulta,
-    p.nome_paciente AS nome_paciente,
-    d.nome AS nome_dentista,
-    c.data_consulta,
-    pr.id_procedimento,
-	c.status_consulta AS status_da_consulta
 FROM 
     clinica.consultas c
 JOIN 
