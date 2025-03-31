@@ -427,9 +427,9 @@ CREATE INDEX idx_consultas_data_dentista ON clinica.consultas (data_consulta, id
 
 ---------------------------------------------------------------------------------
 --3 ATUALIZAÇÕES DE REGISTROS COM CONDIÇÕES
-UPDATE clinica.telefone
-SET telefone = '99999-1234'
-WHERE id_paciente = 5;
+UPDATE clinica.paciente
+SET nome_paciente = 'Creuzinha Cunha'
+WHERE id_paciente = 11;
 
 UPDATE clinica.endereco
 SET id_cep = 10, numero = 500, complemento = 'apto 101'
