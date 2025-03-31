@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS clinica.consultas(
     data_consulta DATE NOT NULL,
     descricao_consulta VARCHAR(200) DEFAULT NULL,
     prescricao VARCHAR(200) DEFAULT NULL,
-	status status_consulta DEFAULT 'agendada',
+    status status_consulta DEFAULT 'agendada',
     id_paciente INT NOT NULL,
     id_dentista INT NOT NULL,
     id_horario INT NOT NULL,
@@ -183,10 +183,10 @@ CREATE TABLE IF NOT EXISTS clinica.procedimentos_realizados(
     id_procedimentos_realizados SERIAL PRIMARY KEY,
     id_paciente INT NOT NULL,
     id_procedimento INT NOT NULL,
-	id_consulta INT NOT NULL,
+    id_consulta INT NOT NULL,
     FOREIGN KEY(id_paciente) REFERENCES clinica.paciente(id_paciente),
     FOREIGN KEY(id_procedimento) REFERENCES clinica.procedimentos(id_procedimento),
-	FOREIGN KEY(id_consulta) REFERENCES clinica.consultas(id_consulta)
+    FOREIGN KEY(id_consulta) REFERENCES clinica.consultas(id_consulta)
 );
 
 
@@ -255,7 +255,8 @@ VALUES
 ('00000-000', 10, 1);
 
 INSERT INTO clinica.endereco
-(numero,
+(id_paciente,
+numero,
 complemento,
 id_cidade,
 id_bairro,
@@ -276,34 +277,34 @@ VALUES
 
 ---------------------------------------------------------------------------------
 --PACIENTES
-INSERT INTO clinica.email (email)
+INSERT INTO clinica.email (email, id_paciente)
 VALUES
-('jose@email.com'),
-('leticia@email.com'),
-('victor@email.com'),
-('laryssa@email.com'),
-('Beatriz@email.com'),
-('carlos@email.com'),
-('marcos@email.com'),
-('fernanda@email.com'),
-('ricardo@email.com'),
-('patricia@email.com'),
-('joazinhogmail.com');
+('jose@email.com', 1),
+('leticia@email.com', 2),
+('victor@email.com', 3),
+('laryssa@email.com', 4),
+('Beatriz@email.com', 5),
+('carlos@email.com', 6),
+('marcos@email.com', 7),
+('fernanda@email.com', 8),
+('ricardo@email.com', 9),
+('patricia@email.com', 10),
+('joazinhogmail.com', 11);
 
 
-INSERT INTO clinica.telefone (telefone)
+INSERT INTO clinica.telefone (telefone, id_paciente)
 VALUES
-('(11) 9999-8888'),
-('(11) 9888-7777'),
-('(11) 9777-6666'),
-('(11) 9666-5555'),
-('(11) 9444-3333'),
-('(11) 9555-4444'),
-('(11) 9333-2222'),
-('(11) 9222-1111'),
-('(11) 9111-0000'),
-('(11) 9000-9999'),
-('(21) 9955-5577');
+('(11) 9999-8888', 1),
+('(11) 9888-7777', 2),
+('(11) 9777-6666', 3),
+('(11) 9666-5555', 4),
+('(11) 9444-3333', 5),
+('(11) 9555-4444', 6),
+('(11) 9333-2222', 7),
+('(11) 9222-1111', 8),
+('(11) 9111-0000', 9),
+('(11) 9000-9999', 10),
+('(21) 9955-5577', 11);
 
 INSERT INTO clinica.paciente
 (nome_paciente, cpf, data_nascimento, id_endereco, historico_consultas, id_email, id_telefone)
